@@ -45,4 +45,3 @@ POST /users/{id}/subscriptions - добавить подписку
 GET /users/{id}/subscriptions - получить подписки пользователя
 DELETE /users/{id}/subscriptions/{sub_id} - удалить подписку
 GET /subscriptions/top - получить ТОП-3 популярных подписок
-![image](https://github.com/user-attachments/assets/c943ddd2-363b-4b5f-b3ec-c208fcf87254)
