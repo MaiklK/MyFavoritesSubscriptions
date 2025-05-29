@@ -1,0 +1,25 @@
+services:
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: favorites_subscriptions_db
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: username
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  myfavoritessubscriptions:
+    container_name: my-favorites-subscriptions
+    image: favoritessubscriptions
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+
+volumes:
+  data:
+    driver: local
