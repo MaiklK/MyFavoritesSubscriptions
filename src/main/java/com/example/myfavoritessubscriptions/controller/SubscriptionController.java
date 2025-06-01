@@ -1,7 +1,7 @@
 package com.example.myfavoritessubscriptions.controller;
 
 import com.example.myfavoritessubscriptions.entity.Subscription;
-import com.example.myfavoritessubscriptions.service.SubscriptionService;
+import com.example.myfavoritessubscriptions.service.Impl.SubscriptionServiceImpl;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,11 +21,11 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SubscriptionController {
-    SubscriptionService subscriptionService;
+    SubscriptionServiceImpl subscriptionServiceImpl;
 
     @GetMapping("top/{limit})")
     public ResponseEntity<List<Subscription>> addSubscription(@PathVariable int limit) {
-        var subscriptions = subscriptionService.getTopPopularSubscriptions(limit);
+        var subscriptions = subscriptionServiceImpl.getTopPopularSubscriptions(limit);
         return ResponseEntity.ok(subscriptions);
     }
 }
