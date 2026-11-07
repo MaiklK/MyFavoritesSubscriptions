@@ -1,6 +1,7 @@
 package com.example.myfavoritessubscriptions.service.Impl;
 
-import com.example.myfavoritessubscriptions.entity.Subscription;
+import com.example.myfavoritessubscriptions.dto.SubscriptionMapper;
+import com.example.myfavoritessubscriptions.dto.SubscriptionResponse;
 import com.example.myfavoritessubscriptions.repository.SubscriptionRepository;
 import com.example.myfavoritessubscriptions.service.SubscriptionService;
 import lombok.AccessLevel;
@@ -21,8 +22,14 @@ import java.util.List;
 public class SubscriptionServiceImpl implements SubscriptionService {
     SubscriptionRepository subscriptionRepository;
 
-    public List<Subscription> getTopPopularSubscriptions(int limit) {
-        List<Subscription> subscriptions = subscriptionRepository.findTopPopularSubscriptions();
-        return subscriptions.size() > 3 ? subscriptions.subList(0, limit) : subscriptions;
+    @Override
+    public List<SubscriptionResponse> getTopPopularSubscriptions(int limit) {
+        if (limit <= 0) {
+            return List.of();
+        }
+        return SubscriptionMapper.toSortedResponses(
+                subscriptionRepository.findTopPopularSubscriptions().stream()
+                        .limit(limit)
+                        .toList());
     }
 }

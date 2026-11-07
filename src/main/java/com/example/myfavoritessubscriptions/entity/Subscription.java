@@ -1,33 +1,65 @@
 package com.example.myfavoritessubscriptions.entity;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "subscriptions")
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @Builder
-@Table(name = "subscriptions")
+@ToString
 public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
-    @NotBlank(message = "Не указанно имя подписки")
-    @Size(min = 2, max = 50, message = "Имя подписки должно быть от 2 до 50 символов")
+
+    @Column(name = "subscription_name", nullable = false, unique = true)
     private String subscriptionName;
 
+    @Builder.Default
+    @ToString.Exclude
     @ManyToMany(mappedBy = "subscriptions")
-    private Set<User> users;
+    private Set<User> users = new LinkedHashSet<>();
+
+    /**
+     * Равенство определяется бизнес-ключом {@code subscriptionName} в нижнем регистре:
+     * сущность может быть ещё не сохранена и не иметь id.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Subscription other)) {
+            return false;
+        }
+        return subscriptionName != null
+                && other.subscriptionName != null
+                && subscriptionName.equalsIgnoreCase(other.subscriptionName);
+    }
 
     @Override
-    public String toString() {
-        return subscriptionName;
+    public int hashCode() {
+        return subscriptionName == null
+                ? System.identityHashCode(this)
+                : subscriptionName.toLowerCase().hashCode();
     }
 }

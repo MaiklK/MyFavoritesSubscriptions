@@ -20,6 +20,55 @@ services:
     ports:
       - "8080:8080"
 
+  elasticsearch:
+    image: elasticsearch:8.12.2
+    container_name: elasticsearch
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: "username"
+      ELASTIC_PASSWORD: "password"
+      Discovery.type: single-node
+      bootstrap.memory_lock: true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  logstash:
+    image: logstash:8.12.2
+    container_name: logstash
+    environment:
+      - LS_JAVA_OPTS=-Xms256m -Xmx256m
+    ports:
+      - "5044:5044"
+      - "5000:5000"
+      - "9600:9600"
+    volumes:
+      - ./src/main/resources/configs/logstash/config/logstash.yml:/usr/share/logstash/logstash.yml
+      - ./src/main/resources/configs/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./src/main/resources/configs/logstash/pipelines:/usr/share/logstash/config/pipelines:ro
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: kibana:8.12.2
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./src/main/resources/configs/kibana/config.yml:/usr/share/kibana/config/kibana.yml:ro
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana.example.org
+    depends_on:
+      - elasticsearch
+
 volumes:
+  esdata:
   data:
     driver: local

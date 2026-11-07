@@ -1,23 +1,25 @@
 package com.example.myfavoritessubscriptions.service;
 
-import com.example.myfavoritessubscriptions.entity.Subscription;
-import com.example.myfavoritessubscriptions.entity.User;
+import com.example.myfavoritessubscriptions.dto.SubscriptionRequest;
+import com.example.myfavoritessubscriptions.dto.SubscriptionResponse;
+import com.example.myfavoritessubscriptions.dto.UserCreateRequest;
+import com.example.myfavoritessubscriptions.dto.UserResponse;
+import com.example.myfavoritessubscriptions.dto.UserUpdateRequest;
 
-import java.util.List;
 import java.util.Set;
 
 public interface UserService {
-    User createUser(User user);
+    UserResponse createUser(UserCreateRequest request);
 
-    User getUser(Long userId);
+    UserResponse getUser(Long userId);
 
-    void updateUser(Long userId, User user);
+    void updateUser(Long userId, UserUpdateRequest request);
 
     void deleteUser(Long userId);
 
-    void addSubscriptionToUser(Long userId, Subscription subscription);
+    void addSubscriptionToUser(Long userId, SubscriptionRequest request);
 
-    void removeSubscriptionFromUser(Long userId, Subscription subscription);
+    void removeSubscriptionFromUser(Long userId, SubscriptionRequest request);
 
-    Set<Subscription> getSubscriptionsForUser(Long userId);
+    Set<SubscriptionResponse> getSubscriptionsForUser(Long userId);
 }

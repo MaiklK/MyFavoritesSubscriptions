@@ -1,45 +1,73 @@
 package com.example.myfavoritessubscriptions.entity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "users")
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @Builder
-@Table(name = "users")
+@ToString
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
-    @NotBlank(message = "Не указано имя пользователя")
-    @Size(min = 2, max = 50, message = "Имя пользователя должно быть от 2 до 50 символов")
+
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
-    @Column
-    @Email(message = "Не правильный адрес почты")
-    @NotBlank(message = "Не заполнен e-mail пользователя")
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Fetch(FetchMode.JOIN)
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    /**
+     * Подписки пользователя. Порядок не гарантируется, поэтому при сериализации
+     * ответа используется явная сортировка (см. SubscriptionMapper).
+     */
+    @Builder.Default
+    @ToString.Exclude
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "user_subscriptions",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "subscription_id"))
-    private Set<Subscription> subscriptions;
+    private Set<Subscription> subscriptions = new LinkedHashSet<>();
 
     @Override
-    public String toString() {
-        return "name=" + name;
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof User other)) {
+            return false;
+        }
+        if (id != null && other.id != null) {
+            return id.equals(other.id);
+        }
+        return email != null && email.equalsIgnoreCase(other.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : System.identityHashCode(this);
     }
 }
